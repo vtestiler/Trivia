@@ -3,7 +3,10 @@
     <string name="title">Trivia</string>
     <string name="false_title">False</string>
     <string name="true_title">True</string>
-    <string name="previouse_button">previouse button</string>
+    <string name="previous_button">previouse button</string>
     <string name="next_button">next button</string>
     <string name="counter_question">0 of 100</string>
+    <string name="score_value">0%</string>
+    <string name="text_view">Hello there. Trivia questions will show up here.</string>
+    <string name="score_label">Score</string>
 </resources>

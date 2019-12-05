@@ -27,11 +27,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TextView questionTextview;
     private TextView questionCounterTextview;
+    private TextView scoreTextView;
     private Button trueButton;
     private Button falseButton;
     private ImageButton prevButton;
     private ImageButton nextButton;
     private int currentQuestionIndex = 0;
+    private int numberOfRightAnswers = 0;
+    private double score = 0;
     private List<Question> questionList;
     private AnimationSound animationSound;
 
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         falseButton = findViewById(R.id.false_btn);
         questionTextview = findViewById(R.id.question_textview);
         questionCounterTextview = findViewById(R.id.counter_text);
+        scoreTextView = findViewById(R.id.score_value);
         animationSound = new AnimationSound(this, R.raw.cashreg);
 
         nextButton.setOnClickListener(this);
@@ -72,21 +76,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch(v.getId()){
             case R.id.prev_btn:
                 currentQuestionIndex = (((currentQuestionIndex - 1) % questionList.size()) + questionList.size()) % questionList.size();
-                updateQuestion();
+                updateUI();
                 animationSound.startsound();
                 break;
             case R.id.next_btn:
                 currentQuestionIndex = (currentQuestionIndex + 1) % questionList.size();
-                updateQuestion();
+                updateUI();
                 animationSound.startsound();
                 break;
             case R.id.true_btn:
                 checkAnswer(true);
-                updateQuestion();
+                updateUI();
                 break;
             case R.id.false_btn:
                 checkAnswer(false);
-                updateQuestion();
+                updateUI();
                 break;
         }
 
@@ -97,6 +101,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(b == answer){
             // True answer
             //translateAnimation();
+            if(numberOfRightAnswers <= questionList.size()){
+                numberOfRightAnswers++;
+                //Log.d("Score", "Number in checkAnswer = " + numberOfRightAnswers);
+            }
+
             fadeView();
             Toast.makeText(this,"Correct!", Toast.LENGTH_SHORT).show();
 
@@ -105,11 +114,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             shakeAnimation();
             Toast.makeText(this,"Wrong Answer!", Toast.LENGTH_SHORT).show();
         }
+        //currentQuestionIndex = (currentQuestionIndex + 1) % questionList.size();
     }
 
-    private void updateQuestion(){
+    private void updateUI(){
         questionTextview.setText(questionList.get(currentQuestionIndex).getAnswer());
         questionCounterTextview.setText(currentQuestionIndex + " /" + questionList.size());
+        score = (double)numberOfRightAnswers / (double)questionList.size() * 100.0;
+        int scored = (int)Math.round(score);
+        //score = (int) Math.ceil((double) 6 / 900) ;
+        Log.d("Score", "Number in updateUI = " + numberOfRightAnswers);
+        Log.d("Score", "questionList.size() = " + questionList.size());
+        Log.d("Score", "Score = " + score);
+        scoreTextView.setText(scored +"%");
     }
     private void shakeAnimation(){
         Animation shake = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shake_animation);
