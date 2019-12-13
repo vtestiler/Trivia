@@ -3,6 +3,8 @@ package tk.kituthegreat.trivia;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,12 +20,12 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import tk.kituthegreat.trivia.controller.AppController;
 import tk.kituthegreat.trivia.data.AnswerListAsyncResponse;
 import tk.kituthegreat.trivia.data.QuestionBank;
 import tk.kituthegreat.trivia.model.Question;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final String PREFS_ID = "trivia_prefs";
 
     private TextView questionTextview;
     private TextView questionCounterTextview;
@@ -34,9 +36,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton nextButton;
     private int currentQuestionIndex = 0;
     private int numberOfRightAnswers = 0;
-    private double score = 0;
+    private float score = 0;
     private List<Question> questionList;
-    private AnimationSound animationSound;
+    private AnimationSound next_prev_button_sound;
+    private AnimationSound lose_sound;
+    private AnimationSound win_sound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         questionTextview = findViewById(R.id.question_textview);
         questionCounterTextview = findViewById(R.id.counter_text);
         scoreTextView = findViewById(R.id.score_value);
-        animationSound = new AnimationSound(this, R.raw.cashreg);
+        next_prev_button_sound = new AnimationSound(this, R.raw.next_prev);
+        lose_sound = new AnimationSound(this, R.raw.lose);
+        win_sound = new AnimationSound(this, R.raw.win);
 
         nextButton.setOnClickListener(this);
         prevButton.setOnClickListener(this);
@@ -59,13 +65,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         questionList = new QuestionBank().getQuestions(new AnswerListAsyncResponse() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void processFinished(ArrayList<Question> questionArrayList) {
                 questionTextview.setText(questionArrayList.get(currentQuestionIndex).getAnswer());
                 questionCounterTextview.setText(currentQuestionIndex + " /" + questionArrayList.size());
+                updateScore();
                 //Log.d("Main", "onCreate: " + questionArrayList);
             }
         });
+
+        //Get data back from SP
+        SharedPreferences getShareData = getSharedPreferences(PREFS_ID, MODE_PRIVATE);
+        numberOfRightAnswers = getShareData.getInt("right_answers", 0);
+        currentQuestionIndex = getShareData.getInt("index", 0);
+        Log.d("From SP", "currentQuestionIndex from SP: " + currentQuestionIndex);
+        Log.d("From SP", "numberOfRightAnswers from SP: "+ numberOfRightAnswers);
+        //updateUI();
 
 
 
@@ -77,20 +93,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.prev_btn:
                 currentQuestionIndex = (((currentQuestionIndex - 1) % questionList.size()) + questionList.size()) % questionList.size();
                 updateUI();
-                animationSound.startsound();
+                next_prev_button_sound.startsound();
                 break;
             case R.id.next_btn:
                 currentQuestionIndex = (currentQuestionIndex + 1) % questionList.size();
                 updateUI();
-                animationSound.startsound();
+                next_prev_button_sound.startsound();
                 break;
             case R.id.true_btn:
                 checkAnswer(true);
                 updateUI();
+                win_sound.startsound();
                 break;
             case R.id.false_btn:
                 checkAnswer(false);
                 updateUI();
+                lose_sound.startsound();
                 break;
         }
 
@@ -117,16 +135,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //currentQuestionIndex = (currentQuestionIndex + 1) % questionList.size();
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateUI(){
         questionTextview.setText(questionList.get(currentQuestionIndex).getAnswer());
         questionCounterTextview.setText(currentQuestionIndex + " /" + questionList.size());
-        score = (double)numberOfRightAnswers / (double)questionList.size() * 100.0;
-        int scored = (int)Math.round(score);
-        //score = (int) Math.ceil((double) 6 / 900) ;
-        Log.d("Score", "Number in updateUI = " + numberOfRightAnswers);
-        Log.d("Score", "questionList.size() = " + questionList.size());
-        Log.d("Score", "Score = " + score);
-        scoreTextView.setText(scored +"%");
+        updateScore();
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_ID, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("right_answers", numberOfRightAnswers);
+        editor.putInt("index", currentQuestionIndex);
+
+        editor.apply();  //saving to disk
     }
     private void shakeAnimation(){
         Animation shake = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shake_animation);
@@ -150,6 +169,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+    }
+
+    private void updateScore(){
+        score = (float)numberOfRightAnswers / (float)questionList.size() * 100.0f;
+        int scored = (int)Math.round(score);
+        //score = (int) Math.ceil((double) 6 / 900) ;
+        Log.d("Score", "Number in updateUI = " + numberOfRightAnswers);
+        Log.d("Score", "questionList.size() = " + questionList.size());
+        Log.d("Score", "Score = " + score);
+        scoreTextView.setText(scored +"%");
     }
 
     private void translateAnimation(){
