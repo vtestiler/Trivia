@@ -9,4 +9,5 @@
     <string name="score_value">0%</string>
     <string name="text_view">Hello there. Trivia questions will show up here.</string>
     <string name="score_label">Score</string>
+    <string name="reset">Reset</string>
 </resources>

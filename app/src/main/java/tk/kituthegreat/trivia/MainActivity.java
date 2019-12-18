@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView scoreTextView;
     private Button trueButton;
     private Button falseButton;
+    private Button resetButton;
     private ImageButton prevButton;
     private ImageButton nextButton;
     private int currentQuestionIndex = 0;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         prevButton = findViewById(R.id.prev_btn);
         trueButton = findViewById(R.id.true_btn);
         falseButton = findViewById(R.id.false_btn);
+        resetButton = findViewById(R.id.reset_btn);
         questionTextview = findViewById(R.id.question_textview);
         questionCounterTextview = findViewById(R.id.counter_text);
         scoreTextView = findViewById(R.id.score_value);
@@ -109,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 checkAnswer(false);
                 updateUI();
                 lose_sound.startsound();
+                break;
+            case R.id.reset_btn:
+                // Reset code in here
                 break;
         }
 
