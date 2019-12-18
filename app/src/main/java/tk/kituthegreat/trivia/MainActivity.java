@@ -140,12 +140,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         questionTextview.setText(questionList.get(currentQuestionIndex).getAnswer());
         questionCounterTextview.setText(currentQuestionIndex + " /" + questionList.size());
         updateScore();
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_ID, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("right_answers", numberOfRightAnswers);
-        editor.putInt("index", currentQuestionIndex);
-
-        editor.apply();  //saving to disk
+//        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_ID, MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putInt("right_answers", numberOfRightAnswers);
+//        editor.putInt("index", currentQuestionIndex);
+//
+//        editor.apply();  //saving to disk
     }
     private void shakeAnimation(){
         Animation shake = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shake_animation);
@@ -216,5 +216,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+    }
+
+    @Override
+    protected void onPause() {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_ID, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("right_answers", numberOfRightAnswers);
+        editor.putInt("index", currentQuestionIndex);
+
+        editor.apply();  //saving to disk
+        super.onPause();
     }
 }
