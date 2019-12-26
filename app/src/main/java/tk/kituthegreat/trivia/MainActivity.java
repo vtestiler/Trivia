@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         prevButton.setOnClickListener(this);
         trueButton.setOnClickListener(this);
         falseButton.setOnClickListener(this);
+        resetButton.setOnClickListener(this);
 
 
         questionList = new QuestionBank().getQuestions(new AnswerListAsyncResponse() {
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 lose_sound.startsound();
                 break;
             case R.id.reset_btn:
-                // Reset code in here
+                resetAll();
                 break;
         }
 
@@ -221,6 +222,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+    }
+
+    private void resetAll(){
+
+        numberOfRightAnswers = 0;
+        currentQuestionIndex = 0;
+        updateUI();
     }
 
     @Override
