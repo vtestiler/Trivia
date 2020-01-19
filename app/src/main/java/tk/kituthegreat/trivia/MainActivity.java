@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import tk.kituthegreat.trivia.data.AnswerListAsyncResponse;
@@ -71,12 +72,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @SuppressLint("SetTextI18n")
             @Override
             public void processFinished(ArrayList<Question> questionArrayList) {
+
+                //Shuffle questions
+
+                Collections.shuffle(questionArrayList);
+
                 questionTextview.setText(questionArrayList.get(currentQuestionIndex).getAnswer());
                 questionCounterTextview.setText(currentQuestionIndex + " /" + questionArrayList.size());
                 updateScore();
                 //Log.d("Main", "onCreate: " + questionArrayList);
             }
         });
+
+
 
         //Get data back from SP
         SharedPreferences getShareData = getSharedPreferences(PREFS_ID, MODE_PRIVATE);
